@@ -1,7 +1,7 @@
 *.py linguist-language=Python
-*.html linguist-language=HTML
 *.css linguist-language=CSS
 *.js linguist-language=JavaScript
+*.html linguist-language=HTML
 *.pkl linguist-vendored
 *.bat linguist-language=Batchfile
 /templates/* linguist-documentation
