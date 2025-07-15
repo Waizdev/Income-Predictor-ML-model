@@ -32,24 +32,6 @@ This project combines **Exploratory Data Analysis (EDA)** and a **Random Forest 
   - Sex
   - Native Country (US)
 
----
-
-## 📂 Folder Structure
-
-income-predictor/
-│
-├── app/
-│ ├── main.py # FastAPI app
-│ └── model/
-│ └── income_model.pkl # Trained model
-│
-├── frontend/
-│ └── index.html # Fully styled web UI
-│
-├── requirements.txt # Python dependencies
-├── run.bat # One-click launcher (Windows)
-└── README.md # This file
-
 
 ---
 
@@ -58,25 +40,32 @@ income-predictor/
 Install dependencies:
 
 pip install -r requirements.txt
+
 Contents of requirements.txt:
 
-nginx
-Copy
-Edit
+
 fastapi
+
 uvicorn
+
 joblib
+
 scikit-learn
+
 python-multipart
+
 jinja2
+
 numpy
 
 ▶️ How to Run
+
 Clone the repo or download it
 
 Install the dependencies
 
 Double-click run.bat
+
 – This will start the API server and open the UI
 
 Or run manually:
