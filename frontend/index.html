@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #495057;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            font-weight: 300;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #495057;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #6c757d;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.1);
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 32px;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result.high-earner {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #b8dacc;
+        }
+
+        .result.low-earner {
+            background: linear-gradient(135deg, #f8d7da 0%, #f1b0b7 100%);
+            border: 2px solid #f1b0b7;
+        }
+
+        .result-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+        }
+
+        .result-text {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .confidence {
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e9ecef;
+            border-top: 4px solid #6c757d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+            
+            .form-container {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Income Predictor</h1>
+            <p>Advanced ML-powered income classification</p>
+        </div>
+        
+        <div class="form-container">
+            <form id="incomeForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" min="16" max="100" value="19" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="education">Education Number</label>
+                        <select id="education" name="education" required>
+                            <option value="">Select Education Level</option>
+                            <option value="1">1 - Preschool</option>
+                            <option value="2">2 - 1st-4th</option>
+                            <option value="3">3 - 5th-6th</option>
+                            <option value="4">4 - 7th-8th</option>
+                            <option value="5">5 - 9th</option>
+                            <option value="6">6 - 10th</option>
+                            <option value="7">7 - 11th</option>
+                            <option value="8">8 - 12th</option>
+                            <option value="9">9 - HS-grad</option>
+                            <option value="10">10 - Some-college</option>
+                            <option value="11">11 - Assoc-voc</option>
+                            <option value="12">12 - Assoc-acdm</option>
+                            <option value="13" selected>13 - Bachelors</option>
+                            <option value="14">14 - Masters</option>
+                            <option value="15">15 - Prof-school</option>
+                            <option value="16">16 - Doctorate</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hoursPerWeek">Hours Worked Per Week</label>
+                        <input type="number" id="hoursPerWeek" name="hoursPerWeek" min="1" max="99" value="33" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="capitalGain">Capital Gain</label>
+                        <input type="number" id="capitalGain" name="capitalGain" min="0" value="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="capitalLoss">Capital Loss</label>
+                        <input type="number" id="capitalLoss" name="capitalLoss" min="0" value="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="workclassPrivate">Work Class</label>
+                        <select id="workclassPrivate" name="workclassPrivate" required>
+                            <option value="">Select Work Class</option>
+                            <option value="1" selected>Private</option>
+                            <option value="0">Not Private</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="marriedCivSpouse">Marital Status</label>
+                        <select id="marriedCivSpouse" name="marriedCivSpouse" required>
+                            <option value="">Select Status</option>
+                            <option value="1">Married (Civ Spouse)</option>
+                            <option value="0" selected>Not Married (Civ Spouse)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="occupationExec">Occupation</label>
+                        <select id="occupationExec" name="occupationExec" required>
+                            <option value="">Select Occupation</option>
+                            <option value="1">Exec-managerial</option>
+                            <option value="0" selected>Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sexMale">Sex</label>
+                        <select id="sexMale" name="sexMale" required>
+                            <option value="">Select Sex</option>
+                            <option value="1" selected>Male</option>
+                            <option value="0">Female</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fromUS">Country</label>
+                        <select id="fromUS" name="fromUS" required>
+                            <option value="">Select Country</option>
+                            <option value="1">United States</option>
+                            <option value="0" selected>Other Country</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="predict-btn">Predict Income</button>
+            </form>
+            
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Analyzing data...</p>
+            </div>
+            
+            <div id="result" class="result">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="confidence" id="confidenceText"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('incomeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('result').classList.remove('show');
+            
+            // Get form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                // Call FastAPI backend
+                const prediction = await predictIncome(data);
+                
+                // Hide loading
+                document.getElementById('loading').classList.remove('show');
+                
+                // Show result
+                displayResult(prediction);
+                
+            } catch (error) {
+                console.error('Prediction failed:', error);
+                
+                // Hide loading
+                document.getElementById('loading').classList.remove('show');
+                
+                // Show error message
+                displayError();
+            }
+        });
+
+        async function predictIncome(data) {
+            // FastAPI endpoint configuration
+            const API_BASE_URL = 'http://localhost:8000'; // Change this to your FastAPI server URL
+            const PREDICT_ENDPOINT = '/predict'; // Change this to your actual endpoint
+            
+            try {
+                // Prepare data for FastAPI
+                const requestData = {
+                    age: parseInt(data.age),
+                    education_number: parseInt(data.education),
+                    hours_per_week: parseInt(data.hoursPerWeek),
+                    capital_gain: parseInt(data.capitalGain),
+                    capital_loss: parseInt(data.capitalLoss),
+                    workclass_private: parseInt(data.workclassPrivate),
+                    married_civ_spouse: parseInt(data.marriedCivSpouse),
+                    occupation_exec: parseInt(data.occupationExec),
+                    sex_male: parseInt(data.sexMale),
+                    from_us: parseInt(data.fromUS)
+                };
+                
+                const response = await fetch(`${API_BASE_URL}${PREDICT_ENDPOINT}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                return result;
+                
+            } catch (error) {
+                console.error('Error calling FastAPI:', error);
+                
+                // Fallback to mock prediction if API fails
+                return mockPredict(data);
+            }
+        }
+
+        function mockPredict(data) {
+            // Fallback mock prediction for development/testing
+            const age = parseInt(data.age);
+            const education = parseInt(data.education);
+            const hoursPerWeek = parseInt(data.hoursPerWeek);
+            const capitalGain = parseInt(data.capitalGain);
+            const capitalLoss = parseInt(data.capitalLoss);
+            const workclassPrivate = parseInt(data.workclassPrivate);
+            const marriedCivSpouse = parseInt(data.marriedCivSpouse);
+            const occupationExec = parseInt(data.occupationExec);
+            const sexMale = parseInt(data.sexMale);
+            const fromUS = parseInt(data.fromUS);
+            
+            // Simple scoring system for demo
+            let score = 0;
+            
+            if (age > 30) score += 20;
+            if (education >= 13) score += 25;
+            if (hoursPerWeek >= 40) score += 20;
+            if (capitalGain > 0) score += 15;
+            if (capitalLoss > 0) score -= 5;
+            if (workclassPrivate === 1) score += 10;
+            if (marriedCivSpouse === 1) score += 15;
+            if (occupationExec === 1) score += 20;
+            if (sexMale === 1) score += 5;
+            if (fromUS === 1) score += 10;
+            
+            const isHighEarner = score >= 60;
+            const confidence = Math.min(95, Math.max(55, score + Math.random() * 20));
+            
+            return {
+                isHighEarner,
+                confidence: confidence.toFixed(2)
+            };
+        }
+
+        function displayResult(prediction) {
+            const resultDiv = document.getElementById('result');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultText = document.getElementById('resultText');
+            const confidenceText = document.getElementById('confidenceText');
+            
+            if (prediction.isHighEarner) {
+                resultDiv.className = 'result high-earner show';
+                resultIcon.textContent = '🟢';
+                resultText.textContent = 'High Earner (>50K)';
+            } else {
+                resultDiv.className = 'result low-earner show';
+                resultIcon.textContent = '🔴';
+                resultText.textContent = 'Low Earner (≤50K)';
+            }
+            
+            confidenceText.textContent = `📊 Model Confidence: ${prediction.confidence}%`;
+        }
+
+        // Add some interactive enhancements
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+            
+            element.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

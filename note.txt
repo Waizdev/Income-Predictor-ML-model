@@ -1,0 +1,4 @@
+for local running:
+uvicorn app.main:app --reload
+for installing:
+pip install -r requirements.txt
