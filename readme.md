@@ -84,11 +84,15 @@ Or run manually:
 uvicorn app.main:app --reload
 
 🤝 Credits
+
 Developed by Syed Muhammad Waiz Rizvi
+
 Bachelor’s in Artificial Intelligence | 4th Semester
+
 University of Management and Technology, Lahore
 
 📫 Contact
+
 Want to collaborate or improve this app? Open an issue or connect with me!
 ---
 
